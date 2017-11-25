@@ -73,6 +73,8 @@ function newEntry() {
   if (document.getElementById("chatbox").value != "") {
     //pulls the value from the chatbox ands sets it to lastUserMessage
     lastUserMessage = document.getElementById("chatbox").value;
+    //lastUserMessage = encodeURIComponent(lastUserMessage.trim())
+    
     //sets the chat box to be clear
     document.getElementById("chatbox").value = "";
     //adds the value of the chatbox to the array messages
