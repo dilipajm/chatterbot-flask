@@ -30,6 +30,18 @@ def get_chat_model():
 		)
 	return mybot
 
+@app.after_request
+def add_header(r):
+    """
+    Add headers to both force latest IE rendering engine or Chrome Frame,
+    and also to cache the rendered page for 10 minutes.
+    """
+    r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    r.headers["Pragma"] = "no-cache"
+    r.headers["Expires"] = "0"
+    r.headers['Cache-Control'] = 'public, max-age=0'
+    return r
+
 @app.route('/get_response/<path:chat>', methods=['POST'])
 def get_response(chat):
 	print chat
@@ -40,16 +52,19 @@ def get_response(chat):
 	# https://www.cs.toronto.edu/~frossard/vgg16/imagenet_classes.py
 	print 'get_response start...'
 	response = mybot.get_response(chat.lower())
-	return jsonify({'response':response.text})
+	#return jsonify({'response':response.text})
+	return response.text
 
-
+@app.route('/index')
+def index():
+	return render_template('index.html')
 
 
 if __name__ == '__main__':
   print 'initialize chat model...'
   mybot = get_chat_model()
   print 'Chat model loaded...'
-  app.run(debug=True, host='0.0.0.0',port=7000) # this will start a local server
+  app.run(debug=False, host='0.0.0.0',port=8000) # this will start a local server
 
 
 
