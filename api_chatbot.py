@@ -4,31 +4,87 @@ print 'OS: ', os.getcwd()
 import urllib
 from flask import Flask, jsonify, render_template
 #where chatterbot module is installed (find by running: pip instll chatterbot)
-sys.path.append('/Library/Python/2.7/site-packages/') 
+sys.path.append('/Library/Python/2.7/site-packages/')
+reload(sys)
+sys.setdefaultencoding('utf-8')
 from chatterbot import ChatBot
+from chatterbot.trainers import ListTrainer
 from chatterbot.trainers import ChatterBotCorpusTrainer
+import pandas as pd
+import numpy as np
+import datetime
 
 app = Flask(__name__) # create a Flask app
 
 global mybot
 
-def get_chat_model():
+def print_timestamp(step='start'):
+	print('-----------Step: ',datetime.datetime.now())
+
+def get_chat_model(train=False):
+	print_timestamp('get_chat_model start')
 	mybot = ChatBot(
 	"Chat Bot",
-	logic_adapters=[
-		{
-			"import_path": "chatterbot.logic.BestMatch",
-			"statement_comparison_function": "chatterbot.comparisons.levenshtein_distance",
-			"response_selection_method": "chatterbot.response_selection.get_first_response"
-		}
-	])
+	storage_adapter="chatterbot.storage.MongoDatabaseAdapter",
+	database='chatterbot-database',
+	#database='chatterbot-database-temp',
+	#storage_adapter='chatterbot.storage.SQLStorageAdapter',
+    #database='./database.sqlite3',
+	# logic_adapters=[
+	# 	{
+	# 		"import_path": "chatterbot.logic.BestMatch",
+	# 		"statement_comparison_function": "chatterbot.comparisons.levenshtein_distance",
+	# 		"response_selection_method": "chatterbot.response_selection.get_first_response"
+	# 	}
+	# ]
+	)
 
-	mybot.set_trainer(ChatterBotCorpusTrainer)
+	if (train):
+		mybot = set_corpus_english(mybot)
+		mybot = set_corpus_movie(mybot)
+	
+	print_timestamp('get_chat_model end')
+	return mybot
 
-	mybot.train(
+def set_corpus_english(temp_bot):
+	print_timestamp('set_corpus_english start')
+	temp_bot.set_trainer(ChatterBotCorpusTrainer)
+	temp_bot.train(
 		"chatterbot.corpus.english"
 		)
-	return mybot
+	print_timestamp('set_corpus_english end')
+	return temp_bot;
+
+def set_corpus_movie(temp_bot):
+	print_timestamp('set_corpus_movie start')
+	filename = 'data/movie_lines.tsv'
+	#filename.decode('utf-8')
+	#raw_df = pd.read_csv(filename)
+	#raw_df.to_csv('data/movie_lines_utf.csv',encoding='utf-8')
+
+	#lines_df = pd.read_csv('data/movie_lines_utf.csv',sep='\t',error_bad_lines=False,warn_bad_lines =False,header=None)
+	lines_df = pd.read_csv(filename,sep='\t',error_bad_lines=False,warn_bad_lines =False,header=None)
+	lines_df.columns = ['lineId','chId','mId','chName','dialogue']
+	print(lines_df.head())
+	arr = lines_df.iloc[0:2000,4:5].values
+	#print(arr)
+	arr2 = []#np.digitize(lines_df.iloc[:, 4:5], bins)
+	
+	for index, str2 in enumerate(arr):
+		str2 = str(str2[0])
+		#str2 = u' '.join((str2, ' ')).encode('utf-8').strip()
+		#str2 = str2.encode('utf-8').strip()
+		#str2 = str2.decode('utf-8')
+		print 'line ',index,' : ', str2
+		arr2.append(str2)
+
+	#print(arr2)
+	print('training start')
+	temp_bot.set_trainer(ListTrainer)
+	temp_bot.train(arr2)
+	print('training finish')
+	print_timestamp('set_corpus_movie end')
+	return temp_bot;
 
 @app.after_request
 def add_header(r):
@@ -44,6 +100,7 @@ def add_header(r):
 
 @app.route('/get_response/<path:chat>', methods=['POST'])
 def get_response(chat):
+	print_timestamp('get_response start')
 	print chat
 	chat = urllib.quote_plus(chat)
 	print chat
@@ -53,16 +110,20 @@ def get_response(chat):
 	print 'get_response start...'
 	response = mybot.get_response(chat.lower())
 	#return jsonify({'response':response.text})
+	print_timestamp('get_response end')
 	return response.text
 
 @app.route('/index')
 def index():
+	print_timestamp('index start')
+	print_timestamp('index end')
 	return render_template('index.html')
 
 
 if __name__ == '__main__':
   print 'initialize chat model...'
   mybot = get_chat_model()
+  mybot.trainer.export_for_training('data/movie_dialog_export.json')
   print 'Chat model loaded...'
   app.run(debug=False, host='0.0.0.0',port=8000) # this will start a local server
 
