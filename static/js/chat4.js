@@ -78,7 +78,7 @@ function newEntry() {
     //sets the chat box to be clear
     document.getElementById("chatbox").value = "";
     //adds the value of the chatbox to the array messages
-    messages.push(lastUserMessage);
+    messages.push("<b>You:</b> "+lastUserMessage);
     //Speech(lastUserMessage);  //says what the user typed outloud
     //sets the variable botMessage in response to lastUserMessage
     //chatbotResponse();
@@ -114,16 +114,23 @@ function get_response_callback(msg) {
 //text to Speech
 //https://developers.google.com/web/updates/2014/01/Web-apps-that-talk-Introduction-to-the-Speech-Synthesis-API
 function Speech(say) {
-  if ('speechSynthesis' in window && talking) {
-    var utterance = new SpeechSynthesisUtterance(say);
-    //msg.voice = voices[10]; // Note: some voices don't support altering params
-    //msg.voiceURI = 'native';
-    //utterance.volume = 1; // 0 to 1
-    //utterance.rate = 0.1; // 0.1 to 10
-    //utterance.pitch = 1; //0 to 2
-    //utterance.text = 'Hello World';
-    //utterance.lang = 'en-US';
-    speechSynthesis.speak(utterance);
+  if ('speechSynthesis' in window)
+  {
+    var msg = new SpeechSynthesisUtterance();
+    var voices = window.speechSynthesis.getVoices();
+    msg.voice = voices[10]; // Note: some voices don't support altering params
+    msg.voiceURI = 'native';
+    msg.volume = 1; // 0 to 1
+    msg.rate = 1; // 0.1 to 10
+    msg.pitch = 2; //0 to 2
+    msg.text = 'Hello World';
+    msg.lang = 'en-US';
+
+    msg.onend = function(e) {
+      console.log('Finished in ' + event.elapsedTime + ' seconds.');
+    };
+
+    speechSynthesis.speak(msg);
   }
 }
 

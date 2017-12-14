@@ -22,7 +22,7 @@ global mybot
 def print_timestamp(step='start'):
 	print('-----------Step: ',datetime.datetime.now())
 
-def get_chat_model(train=False, db='sqlite', dbname='./chatter_database.sqlite3'):
+def get_chat_model(train=False, db='sqlite', dbname='./chatter_database.sqlite3', filename='data/studypal_faq.csv'):
 	print_timestamp('get_chat_model start')
 
 	if db == 'sqlite':
@@ -37,14 +37,14 @@ def get_chat_model(train=False, db='sqlite', dbname='./chatter_database.sqlite3'
 	logic_adapters=[
 		{
 			"import_path": "chatterbot.logic.BestMatch",
-			"statement_comparison_function": "chatterbot.comparisons.levenshtein_distance",
+			#"statement_comparison_function": "chatterbot.comparisons.levenshtein_distance",
 			#"response_selection_method": "chatterbot.response_selection.get_first_response"
 		}
 	]
 	)
 
 	if (train):
-		mybot = set_studypal_training(mybot)
+		mybot = set_studypal_training(mybot, filename)
 		#mybot = set_corpus_english(mybot)
 		#mybot = set_corpus_movie(mybot)
 	
@@ -91,9 +91,10 @@ def set_corpus_movie(temp_bot):
 	print_timestamp('set_corpus_movie end')
 	return temp_bot;
 
-def set_studypal_training(temp_bot):
+def set_studypal_training(temp_bot, csvfile):
 	print_timestamp('set_studypal_training start')
-	filename = 'data/studypal_messages_text.csv'
+	#filename = 'data/studypal_messages_text.csv'
+	filename = csvfile
 
 	rows = []
 	frame_header = ['message']
@@ -161,7 +162,7 @@ if __name__ == '__main__':
   print 'initialize chat model...'
 
   #mybot = get_chat_model(train=True) #Sqlite
-  mybot = get_chat_model(train=True, db='mongodb', dbname='studypal_messages')
+  mybot = get_chat_model(train=True, db='mongodb', dbname='studypal_faq', filename='data/studypal_faq.csv')
 
   #mybot.trainer.export_for_training('data/movie_dialog_export.json')
   print 'Chat model loaded...'
