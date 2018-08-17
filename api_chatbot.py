@@ -141,7 +141,7 @@ def get_response(chat):
 	print_timestamp('get_response start')
 	print chat
 	chat = urllib.quote_plus(chat)
-	print chat
+	# print chat
 	# curl -X POST http://localhost:<port>/get_response/<image url>
 	# http://www.isle.illinois.edu/sst/data/vgg_flickr8k.html
 	# https://www.cs.toronto.edu/~frossard/vgg16/imagenet_classes.py
@@ -161,8 +161,8 @@ def index():
 if __name__ == '__main__':
   print 'initialize chat model...'
 
-  #mybot = get_chat_model(train=True) #Sqlite
-  mybot = get_chat_model(train=True, db='mongodb', dbname='studypal_faq', filename='data/studypal_faq.csv')
+  mybot = get_chat_model(train=True) #Sqlite
+  # mybot = get_chat_model(train=True, db='mongodb', dbname='studypal_faq', filename='data/studypal_faq.csv')
 
   #mybot.trainer.export_for_training('data/movie_dialog_export.json')
   print 'Chat model loaded...'
