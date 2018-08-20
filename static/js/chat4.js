@@ -145,7 +145,7 @@ function keyPress(e) {
     newEntry();
   }
   if (key == 38) {
-    console.log('hi')
+    console.log('Key 38 pressed')
       //document.getElementById("chatbox").value = lastUserMessage;
   }
 }

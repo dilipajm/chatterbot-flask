@@ -53,3 +53,36 @@ pre {
   background-color: #f0f0f0;
   margin-left: 20px;
 }
+
+.type-box {
+  display: inline-block;
+  width: 85%;
+  float: left;
+}
+
+.type-box-button {
+  display: inline-block;
+  width: 10%;
+  float: left;
+}
+
+#search_form .button {
+    background: black;
+    color: white;
+    padding: 0px 15px;
+    border: none;
+    font-size: 7pt;
+    height: 20px;
+}
+
+#search_form input[name="keywords"] {
+    width: 175px;
+    margin-top:2px;
+    float: left;
+    margin-right: 5px;
+}
+
+#search {
+    margin-top: 7px;
+    float: right;
+}
