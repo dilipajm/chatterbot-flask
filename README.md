@@ -1,8 +1,9 @@
 
 # Chatbot using Flask & Chatterbot
 
-## Install chatterbot
+## Install chatterbot & flask
 pip install chatterbot
+pip install flask
 
 ## In init method, api_chatbot
 For sqlite db,
